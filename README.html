@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Weakly- and Semi-Supervised Object Localization &lpar;ICASSP 2023&rpar;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="weakly--and-semi-supervised-object-localization-icassp-2023">Weakly- and Semi-Supervised Object Localization (ICASSP 2023)</h1>
+<p><a href="https://ieeexplore.ieee.org/document/10096663"><img src="https://img.shields.io/badge/Paper-IEEE%20Xplore-blue" alt="Paper"></a>
+<a href="https://2023.ieeeicassp.org/"><img src="https://img.shields.io/badge/Conference-ICASSP%202023-green" alt="Conference"></a>
+<a href="https://doi.org/10.1109/ICASSP49357.2023.10096663"><img src="https://img.shields.io/badge/DOI-10.1109%2FICASSP49357.2023.10096663-orange" alt="DOI"></a></p>
+<blockquote>
+<p><strong>Weakly- and Semi-Supervised Object Localization</strong>
+Zhen-Tang Huang, Yan-He Chen, Mei-Chen Yeh
+<em>IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2023</em></p>
+</blockquote>
+<h2 id="abstract">Abstract</h2>
+<p>Weakly supervised object localization deals with the lack of location-level labels to train localization models. Recently a new evaluation protocol is proposed in which full supervision is available but limited to only a small validation set. It motives us to explore semi-supervised learning for addressing this problem. In particular, the localization model is developed via self-training: we use a small amount of data with full supervision to train a class-agnostic detector, and use it to generate pseudo bounding boxes for data with weak supervision. Furthermore, we propose a selection algorithm to discover high-quality pseudo labels, and deal with data imbalance caused by pseudo labeling. We demonstrate the superiority of the proposed method with performance on par with the state of the art on two benchmarks.</p>
+<p><strong>Index Terms</strong> — weakly supervised object localization, semi-supervised learning, deep learning</p>
+<h2 id="background-weakly-supervised-object-localization-wsol">Background: Weakly Supervised Object Localization (WSOL)</h2>
+<p><strong>What is WSOL?</strong></p>
+<ul>
+<li>Different from fully-supervised object localization that requires <strong>location-level labels</strong> (e.g., bounding boxes) of each training instance, WSOL has only <strong>image-level labels</strong></li>
+<li>A WSOL model is trained to <strong>localize objects of interest</strong> under the setting in which only class labels are given</li>
+<li>WSOL alleviates a huge amount of human efforts to annotate training samples</li>
+</ul>
+<p><strong>Why WSOL Matters:</strong></p>
+<ul>
+<li><strong>Reduces annotation cost</strong>: WSOL significantly reduces the data annotation cost</li>
+<li><strong>Real-world applicability</strong>: Essential to numerous real-world applications where fully-supervised data are difficult to collect, including:
+<ul>
+<li>Autonomous driving</li>
+<li>Defect detection in industrial inspection</li>
+</ul>
+</li>
+<li><strong>Learning under uncertainty</strong>: Models must learn to localize without explicit location supervision</li>
+</ul>
+<p><strong>Challenges in WSOL:</strong></p>
+<ul>
+<li>Some classes contain <strong>small objects</strong> or have <strong>blurred foreground-background boundaries</strong>, making them difficult to localize</li>
+<li>Classes have <strong>different numbers of samples</strong> with varying difficulty levels (data imbalance)</li>
+<li>Recent WSOL methods have not made a major improvement over the class activation mapping (CAM) baseline</li>
+</ul>
+<h2 id="motivation">Motivation</h2>
+<ul>
+<li>Choe et al. find the WSOL problem <strong>ill-posed with only image-level labels</strong> and propose an evaluation protocol where a <strong>small validation set with full supervision</strong> is available</li>
+<li>This study also shows that recent WSOL methods have not made a major improvement over the CAM baseline</li>
+<li>More interestingly, a <strong>few-shot learning method outperforms existing WSOL methods</strong>, where the full-supervision at validation time is used for model training instead</li>
+<li>Considering that <strong>a small amount of data with full supervision</strong> and <strong>a large amount of data with weak supervision</strong> are both available for training a WSOL model, we propose a new approach that explores <strong>semi-supervised learning (SSL)</strong> to tackle this problem</li>
+<li><strong>Key Question</strong>: How can we effectively incorporate both weak and full supervision to improve WSOL performance?</li>
+</ul>
+<p align="center">
+  <img src="file:////Users/tomhuang/Documents/github/icassp/assets/architecture.png" alt="Model Architecture" width="700"/>
+</p>
+<h2 id="main-contributions">Main Contributions</h2>
+<ol>
+<li>
+<p><strong>First SSL-based WSOL Method</strong>: We propose a SSL based method to address the WSOL problem. To the best of our knowledge, we are among the first that explore SSL to tackle this problem.</p>
+</li>
+<li>
+<p><strong>Identify Key Challenges</strong>: We identify the challenges in developing a SSL based method for WSOL, including the training of a robust base detector using a few labeled samples per class and training with long-tailed distributed data caused by pseudo labeling. The proposed method addresses both issues.</p>
+</li>
+<li>
+<p><strong>State-of-the-Art Performance</strong>: We evaluate the proposed method on WSOL benchmarks and show that it improves previous methods by a large margin in localization accuracy. We further conduct a cross-dataset evaluation to demonstrate its generalization capability.</p>
+</li>
+</ol>
+<h2 id="method">Method</h2>
+<p>The overview of our method is displayed in the figure above. We decouple the WSOL task into <strong>class-agnostic object detection</strong> and <strong>image classification</strong>, alleviating the requirement of abundant samples per class to train a robust detector.</p>
+<p><strong>Overview of Our Approach:</strong></p>
+<ol>
+<li>First, we train an object detection model using the <strong>validation set</strong>, in which the bounding boxes of samples are given</li>
+<li>Then use the <strong>training set</strong> to perform self-training via pseudo labeling</li>
+<li>We propose a <strong>selection scheme</strong> to find reliable pseudo labels</li>
+<li>The detection model is <strong>re-trained</strong> by using both the fully and pseudo labeled images</li>
+<li>Finally, we train an <strong>image classifier</strong> to determine the class label</li>
+</ol>
+<p><strong>Benefits of SSL Method:</strong></p>
+<ul>
+<li>Modern fully-supervised object detection techniques can be applied to WSOL</li>
+<li>One benefit is that we can leverage powerful detection models like YOLOv5</li>
+</ul>
+<p><strong>Challenges in SSL for WSOL:</strong></p>
+<ul>
+<li>The object detection model—trained with <strong>few data</strong>—must reach a reasonable performance to infer pseudo labels from weakly labeled data</li>
+<li>The model will be trained inevitably with <strong>imbalanced data</strong> because the number of pseudo labels inferred by the model may differ significantly for each class</li>
+<li>The amount of pseudo labels created from <strong>difficult samples</strong> would be small if we screen the pseudo labels by quality (e.g., confidence score of the detection)</li>
+</ul>
+<h3 id="stage-1-training-class-agnostic-detector">Stage 1: Training Class-Agnostic Detector</h3>
+<p>We first train a class-agnostic detection model with the validation set containing only a few location-level labeled samples. The base detector model must reach a good detection accuracy because it will be used to infer the pseudo labels from the training set.</p>
+<p><strong>Implementation Details:</strong></p>
+<ul>
+<li>We develop the base detection model upon <strong>YOLOv5</strong>, which is a modern model for fully supervised object detection</li>
+<li>Trained with only the <strong>validation set</strong> (very few labeled samples per class)</li>
+</ul>
+<p><strong>Why Class-Agnostic?</strong></p>
+<ul>
+<li>We train a <strong>class-agnostic detector</strong>, in which the model aims to localize foreground objects</li>
+<li>With the labeled data in the validation set, it is <strong>difficult to train YOLO to simultaneously perform localization and classification</strong></li>
+<li>The <strong>localization task</strong> requires the extraction of <strong>global features</strong> from the whole object</li>
+<li>The <strong>classification task</strong> often relies on the most discriminative part (<strong>local features</strong>) of the object</li>
+<li>These two objectives can <strong>conflict</strong> with each other when training data is scarce</li>
+</ul>
+<p><strong>Benefits of Class-Agnostic Approach:</strong></p>
+<ul>
+<li><strong>Alleviates insufficient data problem</strong>: Training a foreground object detector can alleviate the problem of insufficient location-level labeled data</li>
+<li><strong>Reduces task complexity</strong>: Excluding the classification objective reduces the task complexity</li>
+<li><strong>Focus on localization capability</strong>: We focus on the capability of the model to localize foreground objects, subsequently applied to produce pseudo labels from weakly labeled training data</li>
+</ul>
+<h3 id="stage-2-self-training-via-pseudo-labeling">Stage 2: Self-Training via Pseudo Labeling</h3>
+<p>We perform self-training via pseudo labeling—the detection model is used to generate the pseudo bounding boxes for all training images, which contain only image-level annotations.</p>
+<p><strong>Key Insight:</strong></p>
+<ul>
+<li>The <strong>quality</strong> of pseudo labels is as important as the <strong>quantity</strong></li>
+<li>Using low-quality pseudo labels might hinder the model from effective detection</li>
+<li>However, selecting only high-quality pseudo labels may lead to <strong>data imbalance</strong>: some categories may contain more data samples than others</li>
+</ul>
+<h3 id="pseudo-labels-selection-algorithm">Pseudo-Labels Selection Algorithm</h3>
+<p>The usage of pseudo labels is important in semi-supervised learning. Specifically, the <strong>trade-off between the quantity and the quality</strong> of pseudo labels must be considered. The proposed pseudo-labels selection algorithm prioritizes high-confidence pseudo labels, avoiding the involvement of poor-quality ones that may deteriorate the model training and affect accuracy.</p>
+<p><strong>Why Use Minimum Confidence Score?</strong></p>
+<ul>
+<li>The selection is performed based on the <strong>confidence score</strong> of a detected box returned by the detector</li>
+<li>If the confidence scores of <strong>all</strong> detected boxes are greater than the threshold, the sample is selected</li>
+<li>Note that the step of calculating the <strong>minimal confidence score</strong> for all bounding boxes in one image is important, which is <strong>not as trivial as that in a classification task</strong></li>
+<li>In object localization we may have <strong>more than one instance</strong> in one sample</li>
+<li>If we simply select the instances with large confidence scores, we may feed the model with <strong>partial annotation</strong></li>
+<li>This is <strong>hurtful to model training</strong> because some foreground objects are treated to be background</li>
+</ul>
+<p><strong>Strict Selection Policy:</strong></p>
+<ul>
+<li>As we have a <strong>large set of weakly labeled training samples</strong>, we can take a strict selection policy</li>
+<li>Only those images whose bounding boxes scores are <strong>all</strong> greater than the threshold are selected</li>
+<li>This avoids the situation where foreground objects are mistakenly treated as background</li>
+</ul>
+<pre><code>Algorithm 1: Selecting Reliable Pseudo Labels
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Input:
+    Samples S: each sample xᵢ has a class label yᵢ, nᵢ pseudo boxes {bⱼ}
+              and nᵢ confidence scores {sⱼ}
+    A threshold γ
+    The number of selected samples per class N
+
+Output:
+    Selected samples F
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 1: Initialize F ← ∅
+ 2: for xᵢ ∈ S do
+ 3:     Calculate mᵢ ← minⱼ{sⱼ}
+ 4: end for
+ 5: Sort samples by descending order of mᵢ
+ 6: for xᵢ ∈ sorted S do
+ 7:     let n be the no. of selected samples whose label is yᵢ
+ 8:     if mᵢ ≥ γ and n &lt; N then
+ 9:         Put xᵢ into F
+10:     end if
+11: end for
+12: return F
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+</code></pre>
+<h3 id="stage-3-model-training-and-inference">Stage 3: Model Training and Inference</h3>
+<p>Despite that pseudo labeling is simple yet effective for utilizing unlabeled samples, it creates the <strong>data imbalance problem</strong> because classes have different amounts of hard samples. For some classes that are more difficult to detect, the number of selected samples is small, which exacerbates the difficulty of training the model for detecting those classes.</p>
+<p><strong>Model Re-training:</strong></p>
+<ul>
+<li>The detection model is <strong>re-trained</strong> by using both of the fully and pseudo labeled images</li>
+<li>The WSOL model is trained with the <strong>focal loss</strong>, which can focus more on difficult samples during training</li>
+<li>Using the focal loss can effectively address <strong>data imbalance</strong> and <strong>sample difficulty</strong>, which is a challenge we must address when applying the pseudo labeling strategy for WSOL</li>
+</ul>
+<p><strong>Inference Procedure:</strong></p>
+<ul>
+<li>We feed a test image into the WSOL model to obtain bounding boxes</li>
+<li>We use an <strong>image classifier</strong> to compute the class label for each box</li>
+<li>We use <strong>ResNeXt101</strong> and <strong>NTSNET</strong> models to train the image classifiers for ImageNet and CUB, respectively</li>
+</ul>
+<h2 id="experimental-setting">Experimental Setting</h2>
+<h3 id="datasets">Datasets</h3>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Description</th>
+<th>Labeled Samples per Class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ImageNet</strong></td>
+<td>Large-scale visual recognition</td>
+<td>10 samples (validation set)</td>
+</tr>
+<tr>
+<td><strong>CUB</strong></td>
+<td>Caltech-UCSD Birds-200-2011</td>
+<td>5 samples (validation set)</td>
+</tr>
+</tbody>
+</table>
+<p>We followed the protocol specified in Choe et al. for dividing the data for training, validation and evaluation.</p>
+<h3 id="evaluation-metrics">Evaluation Metrics</h3>
+<p>Three evaluation metrics were applied to evaluate the performance:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GT-known Loc (GT Loc)</strong></td>
+<td>Localization accuracy when ground-truth class is known (main metric)</td>
+</tr>
+<tr>
+<td><strong>Top-1 Loc</strong></td>
+<td>Localization accuracy with top-1 classification</td>
+</tr>
+<tr>
+<td><strong>Top-5 Loc</strong></td>
+<td>Localization accuracy with top-5 classification</td>
+</tr>
+</tbody>
+</table>
+<p>This study uses <strong>GT Loc as the main evaluation metric</strong> because the essence of WSOL is localization rather than classification. This echoes the claim made in Choe et al., in which the authors advocate the measurement of localization performance alone.</p>
+<h3 id="training-configuration">Training Configuration</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>ImageNet</th>
+<th>CUB</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Epochs</td>
+<td>300</td>
+<td>300</td>
+</tr>
+<tr>
+<td>Batch Size</td>
+<td>30</td>
+<td>30</td>
+</tr>
+<tr>
+<td>N (samples per class)</td>
+<td>20</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Confidence Threshold γ</td>
+<td>0.9</td>
+<td>0.95</td>
+</tr>
+<tr>
+<td>Total Pseudo-labeled Images</td>
+<td>19,032</td>
+<td>1,518</td>
+</tr>
+<tr>
+<td>Training Data Usage</td>
+<td><strong>2.3%</strong></td>
+<td><strong>42%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>All experiments were conducted on a machine with an <strong>NVIDIA GeForce RTX 3090 GPU</strong>.</p>
+<h2 id="experimental-results">Experimental Results</h2>
+<h3 id="comparison-with-state-of-the-arts-on-imagenet">Comparison with State-of-the-Arts on ImageNet</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>GT Loc</th>
+<th>Top-1 Loc</th>
+<th>Top-5 Loc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FSL (CVPR'20)</td>
+<td>66.30</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>PSOL (CVPR'20)</td>
+<td>66.28</td>
+<td>55.31</td>
+<td>64.18</td>
+</tr>
+<tr>
+<td>SLT-Net (CVPR'21)</td>
+<td>67.60</td>
+<td>55.70</td>
+<td>65.40</td>
+</tr>
+<tr>
+<td>SCG (CVPR'21)</td>
+<td>65.05</td>
+<td>49.56</td>
+<td>61.32</td>
+</tr>
+<tr>
+<td>SPOL (CVPR'21)</td>
+<td>69.02</td>
+<td><strong>59.14</strong></td>
+<td><strong>67.15</strong></td>
+</tr>
+<tr>
+<td>Zhang et al. (ICASSP'22)</td>
+<td>65.40</td>
+<td>50.10</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Kim et al. (CVPR'22)</td>
+<td>69.89</td>
+<td>53.76</td>
+<td>65.75</td>
+</tr>
+<tr>
+<td>Zhu et al. (CVPR'22)</td>
+<td>70.27</td>
+<td>55.84</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Wu et al. (CVPR'22)</td>
+<td>72.00</td>
+<td>52.97</td>
+<td>66.59</td>
+</tr>
+<tr>
+<td>Supervised baseline</td>
+<td>61.45</td>
+<td>46.73</td>
+<td>56.44</td>
+</tr>
+<tr>
+<td>SSL w. cross entropy loss</td>
+<td>67.57</td>
+<td>50.35</td>
+<td>61.22</td>
+</tr>
+<tr>
+<td><strong>SSL w. focal loss (Ours)</strong></td>
+<td><strong>74.72</strong></td>
+<td>54.09</td>
+<td>66.51</td>
+</tr>
+</tbody>
+</table>
+<h3 id="comparison-with-state-of-the-arts-on-cub">Comparison with State-of-the-Arts on CUB</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>GT Loc</th>
+<th>Top-1 Loc</th>
+<th>Top-5 Loc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FSL (CVPR'20)</td>
+<td>92.00</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>PSOL (CVPR'20)</td>
+<td>93.01</td>
+<td>77.44</td>
+<td>89.51</td>
+</tr>
+<tr>
+<td>SLT-Net (CVPR'21)</td>
+<td>87.60</td>
+<td>67.80</td>
+<td>-</td>
+</tr>
+<tr>
+<td>SCG (CVPR'21)</td>
+<td>72.14</td>
+<td>53.59</td>
+<td>66.50</td>
+</tr>
+<tr>
+<td>SPOL (CVPR'21)</td>
+<td>96.46</td>
+<td>80.12</td>
+<td><strong>93.44</strong></td>
+</tr>
+<tr>
+<td>Zhang et al. (ICASSP'22)</td>
+<td>82.32</td>
+<td>61.85</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Kim et al. (CVPR'22)</td>
+<td>93.17</td>
+<td>70.83</td>
+<td>88.07</td>
+</tr>
+<tr>
+<td>Zhu et al. (CVPR'22)</td>
+<td>81.83</td>
+<td>66.65</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Wu et al. (CVPR'22)</td>
+<td>95.13</td>
+<td>77.25</td>
+<td>90.08</td>
+</tr>
+<tr>
+<td>Supervised baseline</td>
+<td>96.81</td>
+<td>79.70</td>
+<td>91.77</td>
+</tr>
+<tr>
+<td>SSL w. cross entropy loss</td>
+<td>97.96</td>
+<td><strong>80.89</strong></td>
+<td>92.80</td>
+</tr>
+<tr>
+<td><strong>SSL w. focal loss (Ours)</strong></td>
+<td><strong>98.39</strong></td>
+<td>79.96</td>
+<td>92.77</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cross-dataset-generalization-trained-on-imagenet-tested-on-cub">Cross-Dataset Generalization (Trained on ImageNet, Tested on CUB)</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>GT Loc</th>
+<th>Top-1 Loc</th>
+<th>Top-5 Loc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Supervised baseline*</td>
+<td>95.75</td>
+<td>79.55</td>
+<td>91.04</td>
+</tr>
+<tr>
+<td>SSL w. cross entropy loss*</td>
+<td>95.01</td>
+<td>78.72</td>
+<td>90.23</td>
+</tr>
+<tr>
+<td><strong>SSL w. focal loss</strong>*</td>
+<td><strong>96.05</strong></td>
+<td>79.57</td>
+<td>91.15</td>
+</tr>
+</tbody>
+</table>
+<p>Without using any data on CUB, our method trained with the focal loss achieves <strong>96.05% GT Loc</strong> and outperforms many state-of-the-art methods.</p>
+<h3 id="analysis-of-reliable-bounding-box-selection">Analysis of Reliable Bounding Box Selection</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>min. conf.</th>
+<th>GT Loc</th>
+<th>Top-1</th>
+<th>Top-5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SSL w. cross entropy</td>
+<td>✗</td>
+<td>64.95</td>
+<td>48.81</td>
+<td>59.12</td>
+</tr>
+<tr>
+<td>SSL w. cross entropy</td>
+<td>✓</td>
+<td>67.57</td>
+<td>50.35</td>
+<td>61.22</td>
+</tr>
+<tr>
+<td>SSL w. focal loss</td>
+<td>✗</td>
+<td>72.76</td>
+<td>53.22</td>
+<td>65.11</td>
+</tr>
+<tr>
+<td>SSL w. focal loss</td>
+<td>✓</td>
+<td><strong>74.72</strong></td>
+<td><strong>54.09</strong></td>
+<td><strong>66.51</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The accuracy of the model applying the proposed selection strategy is higher than that of the alternative. The results show that it is important to select pseudo labels carefully, as a trivial solution may lead to a situation where some instances may be regarded as background and thereby achieve an inferior performance.</p>
+<h3 id="key-findings">Key Findings</h3>
+<p><strong>Effectiveness of Using Weakly-Labeled Data:</strong></p>
+<ul>
+<li>The proposed SSL method improves the supervised baseline no matter which loss function is applied</li>
+<li>The model trained with the focal loss achieves <strong>74.72% GT Loc</strong> while the baseline achieves <strong>61.45%</strong> in the ImageNet experiment (improvement: <strong>+13.27%</strong>)</li>
+<li>The same observation on performance improvement can also be made in the CUB experiment (<strong>98.39%</strong> vs. <strong>96.81%</strong>)</li>
+</ul>
+<p><strong>Effectiveness of Focal Loss:</strong></p>
+<ul>
+<li>Using <strong>focal loss</strong> can improve <strong>7.15%</strong> in GT Loc compared to cross entropy loss on ImageNet</li>
+<li>In CUB, the performance gain is also observed but is not significant</li>
+<li>Although we do not focus on classification in the proposed method, our performances on Top-1 Loc and Top-5 Loc are <strong>competitive</strong> to those of state-of-the-arts</li>
+</ul>
+<p><strong>Data Efficiency:</strong></p>
+<ul>
+<li>The model is trained using only a small amount of training samples (those selected by the proposed algorithm)</li>
+<li>Only <strong>2.3%</strong> training data used in ImageNet</li>
+<li>Only <strong>42%</strong> training data used in CUB</li>
+</ul>
+<p><strong>Cross-Dataset Generalization:</strong></p>
+<ul>
+<li>The proposed method provides an effective alternative to the few-shot learning baseline</li>
+<li>Trained on ImageNet, achieves <strong>96.05% GT Loc</strong> on CUB <strong>without fine-tuning</strong></li>
+<li>The proposed method has good localization performance with different number of instances, illumination conditions and complex background</li>
+</ul>
+<p align="center">
+  <img src="file:////Users/tomhuang/Documents/github/icassp/assets/results.png" alt="Localization Results" width="600"/>
+</p>
+<p><em>Localization results of the proposed method. Top: CUB, Bottom: ImageNet; Green: Ground Truth, Red: Ours.</em></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>We present a new WSOL method based on SSL. In this approach, we utilize the validation set to train a base model, and then use it to explore the training set via pseudo labeling. Extensive experimental results validate the design choices of the proposed method.</p>
+<p><strong>Future Directions:</strong></p>
+<ul>
+<li>One possible future direction is to elaborate pseudo labels more effectively</li>
+<li>For example, we may consider the <strong>confidence score</strong> and the <strong>stability</strong> of pseudo labels</li>
+</ul>
+<h2 id="poster">Poster</h2>
+<p align="center">
+  <img src="file:////Users/tomhuang/Documents/github/icassp/assets/poster.png" alt="ICASSP 2023 Poster" width="800"/>
+</p>
+<h2 id="materials">Materials</h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Paper (IEEE Xplore)</td>
+<td><a href="https://ieeexplore.ieee.org/document/10096663">Link</a></td>
+</tr>
+<tr>
+<td>Paper (PDF)</td>
+<td><a href="docs/paper.pdf">docs/paper.pdf</a></td>
+</tr>
+<tr>
+<td>Presentation Slides</td>
+<td><a href="docs/slides.pdf">docs/slides.pdf</a></td>
+</tr>
+<tr>
+<td>Video Presentation</td>
+<td><a href="assets/video.mp4">assets/video.mp4</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="citation">Citation</h2>
+<p>If you find this work useful, please cite:</p>
+<pre><code class="language-bibtex">@inproceedings{huang2023weakly,
+  title={Weakly- and Semi-Supervised Object Localization},
+  author={Huang, Zhen-Tang and Chen, Yan-He and Yeh, Mei-Chen},
+  booktitle={IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  pages={1--5},
+  year={2023},
+  organization={IEEE},
+  doi={10.1109/ICASSP49357.2023.10096663}
+}
+</code></pre>
+<h2 id="contact">Contact</h2>
+<ul>
+<li><strong>Zhen-Tang Huang</strong> - <a href="mailto:huang1473690@gmail.com">huang1473690@gmail.com</a></li>
+<li></li>
+</ul>
+<hr>
+<p align="center">
+  <i>Published at ICASSP 2023, Rhodes Island, Greece</i>
+</p>
+
+            
+            
+        </body>
+        </html>
