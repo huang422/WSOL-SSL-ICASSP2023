@@ -323,7 +323,6 @@ If you find this work useful, please cite:
 ## Contact
 
 - **Zhen-Tang Huang** - huang1473690@gmail.com
-- 
 ---
 
 <p align="center">
