@@ -37,7 +37,6 @@ Weakly supervised object localization deals with the lack of location-level labe
 
 - Choe et al. find the WSOL problem **ill-posed with only image-level labels** and propose an evaluation protocol where a **small validation set with full supervision** is available
 - This study also shows that recent WSOL methods have not made a major improvement over the CAM baseline
-- More interestingly, a **few-shot learning method outperforms existing WSOL methods**, where the full-supervision at validation time is used for model training instead
 - Considering that **a small amount of data with full supervision** and **a large amount of data with weak supervision** are both available for training a WSOL model, we propose a new approach that explores **semi-supervised learning (SSL)** to tackle this problem
 - **Key Question**: How can we effectively incorporate both weak and full supervision to improve WSOL performance?
 
@@ -60,7 +59,7 @@ The overview of our method is displayed in the figure above. We decouple the WSO
 **Overview of Our Approach:**
 1. First, we train an object detection model using the **validation set**, in which the bounding boxes of samples are given
 2. Then use the **training set** to perform self-training via pseudo labeling
-3. We propose a **selection scheme** to find reliable pseudo labels
+3. We propose a **selection algorithm** to find reliable pseudo labels
 4. The detection model is **re-trained** by using both the fully and pseudo labeled images
 5. Finally, we train an **image classifier** to determine the class label
 
@@ -99,7 +98,7 @@ We perform self-training via pseudo labeling—the detection model is used to ge
 
 **Key Insight:**
 - The **quality** of pseudo labels is as important as the **quantity**
-- Using low-quality pseudo labels might hinder the model from effective detection
+- Using low-quality pseudo labels might hinder the model from effective training
 - However, selecting only high-quality pseudo labels may lead to **data imbalance**: some categories may contain more data samples than others
 
 ### Pseudo-Labels Selection Algorithm
@@ -241,8 +240,6 @@ All experiments were conducted on a machine with an **NVIDIA GeForce RTX 3090 GP
 | SSL w. cross entropy loss* | 95.01 | 78.72 | 90.23 |
 | **SSL w. focal loss*** | **96.05** | 79.57 | 91.15 |
 
-Without using any data on CUB, our method trained with the focal loss achieves **96.05% GT Loc** and outperforms many state-of-the-art methods.
-
 ### Analysis of Reliable Bounding Box Selection
 
 | Method | min. conf. | GT Loc | Top-1 | Top-5 |
@@ -276,10 +273,6 @@ The accuracy of the model applying the proposed selection strategy is higher tha
 - Trained on ImageNet, achieves **96.05% GT Loc** on CUB **without fine-tuning**
 - The proposed method has good localization performance with different number of instances, illumination conditions and complex background
 
-<p align="center">
-  <img src="assets/results.png" alt="Localization Results" width="600"/>
-</p>
-
 *Localization results of the proposed method. Top: CUB, Bottom: ImageNet; Green: Ground Truth, Red: Ours.*
 
 ## Conclusion
@@ -311,13 +304,12 @@ If you find this work useful, please cite:
 
 ```bibtex
 @inproceedings{huang2023weakly,
-  title={Weakly- and Semi-Supervised Object Localization},
+  title={Weakly-and semi-supervised object localization},
   author={Huang, Zhen-Tang and Chen, Yan-He and Yeh, Mei-Chen},
-  booktitle={IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  booktitle={ICASSP 2023-2023 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
   pages={1--5},
   year={2023},
-  organization={IEEE},
-  doi={10.1109/ICASSP49357.2023.10096663}
+  organization={IEEE}
 }
 ```
 ## Contact
